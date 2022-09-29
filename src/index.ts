@@ -1,4 +1,4 @@
-import { html, LitElement, render } from "lit";
+import { html, LitElement, PropertyValueMap, render } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { tagName as tableIconTag, TableIcon } from "./icons/table-icon";
 import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon";
@@ -49,6 +49,10 @@ export class LitMarkdownEditor extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.renderToLightDom();
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void {
+    super.firstUpdated(_changedProperties);
     this.value = this.textContent ?? "";
     this.textarea.addEventListener("input", () => {
       this.triggerInputEvent();
