@@ -50,5 +50,6 @@ export const markdownStyles = css`
     max-width: 100%;
     min-width: 100%;
     margin: 0;
+    outline: none;
   }
 `;
