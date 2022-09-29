@@ -9,6 +9,23 @@ import { markdownStyles } from "./styles/markdown";
 
 export const tagName = "lit-markdown-editor";
 
+/**
+ * A markdown editor text area built using Lit
+ *
+ * Usage in lit:
+ * @example import "lit-markdown-editor"
+ * ...
+ * render() {
+ *    return html`<lit-markdown-editor name="markdown" id="markdown"></lit-markdown-editor>`
+ * }
+ *
+ * Adding event listeners:
+ * @example
+ * <script>
+ * const litMarkdownEditorElement = document.querySelector("lit-markdown-editor");
+ * litMarkdownEditorElement.addEventListener("input", () => console.log(litMarkdownEditorElement.value))
+ * </script>
+ */
 @customElement(tagName)
 export class LitMarkdownEditor extends LitElement {
   #markdownMap: Map<string, string>;
@@ -144,5 +161,11 @@ export class LitMarkdownEditor extends LitElement {
       <textarea name=${this.name} autocomplete="off" maxlength="5000"></textarea>
       <slot name="input"></slot>
     `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "lit-markdown-editor": LitMarkdownEditor;
   }
 }
