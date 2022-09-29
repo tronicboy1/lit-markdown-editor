@@ -20,7 +20,7 @@ export class LitMarkdownEditor extends LitElement {
   protected textarea!: HTMLTextAreaElement;
 
   get value() {
-    return this.textarea.value;
+    return this.textarea?.value ?? "";
   }
   set value(value: string) {
     if (typeof value !== "string") throw TypeError("Value must be string.");
