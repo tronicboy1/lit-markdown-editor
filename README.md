@@ -125,3 +125,28 @@ export class CustomMarkdownEditor extends LitMarkdownEditor {
   }
 }
 ```
+
+## Loading Initial Values
+
+You can load initial values by dumping text data inside the `<lit-markdown-editor></lit-markdown-editor>` element:
+
+### In a Template
+
+```html
+<lit-markdown-editor name="markdown" id="markdown">
+  # Rick and Morty _Wub a lub a dub dub!_ **speaks to my soul**.
+</lit-markdown-editor>
+```
+
+### Through Javascript
+
+```html
+<lit-markdown-editor name="markdown" id="markdown"></lit-markdown-editor>
+<script>
+  const editor = document.querySelector("lit-markdown-editor");
+  const cache = window.localStorage.getItem("cache");
+  if (cache) {
+    editor.innerHTML = cache;
+  }
+</script>
+```

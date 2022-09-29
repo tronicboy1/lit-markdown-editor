@@ -4,6 +4,7 @@ export const markdownStyles = css`
   :host {
     display: flex;
     width: 100%;
+    max-width: 100%;
     flex-direction: column;
   }
 
