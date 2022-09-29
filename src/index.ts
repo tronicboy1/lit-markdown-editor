@@ -2,7 +2,7 @@ import { html, LitElement, PropertyValueMap, render } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { tagName as tableIconTag, TableIcon } from "./icons/table-icon.js";
 import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon.js";
-import { loadComponent, readFileAsDataString } from "./helpers/index.js";
+import { loadComponent } from "./helpers/index.js";
 import { globalStyles } from "./styles/index.js";
 import formStyles from "./styles/form.js";
 import { markdownStyles } from "./styles/markdown.js";
@@ -148,16 +148,15 @@ export class LitMarkdownEditor extends LitElement {
     if (!files) throw Error("No files object was found on input");
     const file = files[0];
     if (!file || file.size === 0) return;
-    readFileAsDataString(file).then((imageDataString) => {
-      const markdown = `![${file.name}](data:${imageDataString} "${file.name}")`;
-      const { selectionStart, selectionEnd, value } = this.textarea;
-      const textUntilSelectionStart = value.substring(0, selectionStart);
-      const textAfterSelectionEnd = value.substring(selectionEnd);
-      const newLine = "\n";
-      this.textarea.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
-      this.triggerInputEvent();
-      this.renderToLightDom();
-    });
+    const objectURL = URL.createObjectURL(file);
+    const markdown = `![${file.name}](${objectURL} "${file.name}")`;
+    const { selectionStart, selectionEnd, value } = this.textarea;
+    const textUntilSelectionStart = value.substring(0, selectionStart);
+    const textAfterSelectionEnd = value.substring(selectionEnd);
+    const newLine = "\n";
+    this.textarea.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
+    this.triggerInputEvent();
+    this.renderToLightDom();
   };
 
   protected triggerInputEvent() {
