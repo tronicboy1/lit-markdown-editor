@@ -7,7 +7,7 @@ import { globalStyles } from "./styles";
 import formStyles from "./styles/form";
 import { markdownStyles } from "./styles/markdown";
 
-export const tagName = "markdown-textarea";
+export const tagName = "lit-markdown-editor";
 
 @customElement(tagName)
 export class MarkdownTextarea extends LitElement {
