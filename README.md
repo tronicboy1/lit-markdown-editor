@@ -150,3 +150,9 @@ You can load initial values by dumping text data inside the `<lit-markdown-edito
   }
 </script>
 ```
+
+## About the Add Image button
+
+The add image button will add your image as a Base64 data string by default.
+
+If you wish to change the logic of the add image button, please create a custom class and modify the `protected handleHeaderClick` EventListener.

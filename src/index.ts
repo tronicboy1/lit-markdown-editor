@@ -2,10 +2,11 @@ import { html, LitElement, PropertyValueMap, render } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { tagName as tableIconTag, TableIcon } from "./icons/table-icon.js";
 import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon.js";
-import { loadComponent } from "./helpers/index.js";
+import { loadComponent, readFileAsDataString } from "./helpers/index.js";
 import { globalStyles } from "./styles/index.js";
 import formStyles from "./styles/form.js";
 import { markdownStyles } from "./styles/markdown.js";
+import { tagName as newPictureIconTagName, NewPictureIcon } from "./icons/new-picture-icon.js";
 
 export const tagName = "lit-markdown-editor";
 
@@ -36,6 +37,8 @@ export class LitMarkdownEditor extends LitElement {
   public required = false;
   @query("textarea")
   protected textarea!: HTMLTextAreaElement;
+  @query("input#add-file")
+  protected fileInput!: HTMLInputElement;
 
   get value() {
     return this.textarea?.value ?? "";
@@ -62,6 +65,7 @@ export class LitMarkdownEditor extends LitElement {
     ]);
     loadComponent(tableIconTag, TableIcon);
     loadComponent(linkIconTag, LinkIcon);
+    loadComponent(newPictureIconTagName, NewPictureIcon);
   }
 
   connectedCallback(): void {
@@ -135,6 +139,27 @@ export class LitMarkdownEditor extends LitElement {
     this.triggerInputEvent();
   };
 
+  protected handleAddPictureClick: EventListener = () => {
+    this.fileInput.click();
+  };
+
+  private handleFileInput: EventListener = () => {
+    const { files } = this.fileInput;
+    if (!files) throw Error("No files object was found on input");
+    const file = files[0];
+    if (!file || file.size === 0) return;
+    readFileAsDataString(file).then((imageDataString) => {
+      const markdown = `![${file.name}](data:${imageDataString} "${file.name}")`;
+      const { selectionStart, selectionEnd, value } = this.textarea;
+      const textUntilSelectionStart = value.substring(0, selectionStart);
+      const textAfterSelectionEnd = value.substring(selectionEnd);
+      const newLine = "\n";
+      this.textarea.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
+      this.triggerInputEvent();
+      this.renderToLightDom();
+    });
+  };
+
   protected triggerInputEvent() {
     this.dispatchEvent(new Event("input", { composed: true }));
   }
@@ -150,6 +175,7 @@ export class LitMarkdownEditor extends LitElement {
 
   render() {
     return html`
+      <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*" />
       <nav>
         <ul>
           <li @click=${this.handleHeaderClick} id="h1">H1</li>
@@ -164,6 +190,9 @@ export class LitMarkdownEditor extends LitElement {
           </li>
           <li @click=${this.handleTemplateClick} id="link">
             <link-icon></link-icon>
+          </li>
+          <li @click=${this.handleAddPictureClick} style="position: relative;">
+            <new-picture-icon></new-picture-icon>
           </li>
         </ul>
       </nav>
