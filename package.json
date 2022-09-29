@@ -21,6 +21,6 @@
   "scripts": {
     "format": "prettier --write ./",
     "lint": "eslint ./src",
-    "build": "tsc"
+    "build": "tsc && tsc -p tsconfig.types.json"
   }
 }
