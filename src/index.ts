@@ -24,7 +24,7 @@ export class LitMarkdownEditor extends LitElement {
   }
   set value(value: string) {
     if (typeof value !== "string") throw TypeError("Value must be string.");
-    if (!this.textarea) return;
+    if (!this.textarea) throw Error("Cannot set textarea value before render.");
     this.textarea.value = value;
     this.renderToLightDom();
   }
