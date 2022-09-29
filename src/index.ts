@@ -1,11 +1,11 @@
 import { html, LitElement, PropertyValueMap, render } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import { tagName as tableIconTag, TableIcon } from "./icons/table-icon";
-import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon";
-import { loadComponent } from "./helpers";
-import { globalStyles } from "./styles";
-import formStyles from "./styles/form";
-import { markdownStyles } from "./styles/markdown";
+import { tagName as tableIconTag, TableIcon } from "./icons/table-icon.js";
+import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon.js";
+import { loadComponent } from "./helpers/index.js";
+import { globalStyles } from "./styles/index.js";
+import formStyles from "./styles/form.js";
+import { markdownStyles } from "./styles/markdown.js";
 
 export const tagName = "lit-markdown-editor";
 
