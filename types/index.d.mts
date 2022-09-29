@@ -1,6 +1,6 @@
 import { LitElement } from "lit";
-export declare const tagName = "markdown-textarea";
-export declare class MarkdownTextarea extends LitElement {
+export declare const tagName = "lit-markdown-editor";
+export declare class LitMarkdownEditor extends LitElement {
     #private;
     name: string;
     required: boolean;

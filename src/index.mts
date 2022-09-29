@@ -10,7 +10,7 @@ import { markdownStyles } from "./styles/markdown";
 export const tagName = "lit-markdown-editor";
 
 @customElement(tagName)
-export class MarkdownTextarea extends LitElement {
+export class LitMarkdownEditor extends LitElement {
   #markdownMap: Map<string, string>;
   @property({ attribute: "name" })
   public name = "";

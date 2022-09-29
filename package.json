@@ -4,7 +4,7 @@
   "description": "A texteditor web component for writing markdown.",
   "main": "./lib/index.mjs",
   "type": "module",
-  "types": "types",
+  "types": "types/index.d.mts",
   "author": "Austin Mayer <95405354+tronicboy1@users.noreply.github.com>",
   "license": "MIT",
   "private": false,
