@@ -7,3 +7,7 @@ Most markdown tools are very complicated; this component aims to offer a very un
 # Dependencies
 
 This package uses [Lit](https://lit.dev/) as a basis for the web component.
+
+# Accredations
+
+The icons used in this element are from [Google Fonts](https://fonts.google.com/).
