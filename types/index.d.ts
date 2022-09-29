@@ -22,6 +22,7 @@ export declare class LitMarkdownEditor extends LitElement {
     name: string;
     required: boolean;
     protected textarea: HTMLTextAreaElement;
+    protected fileInput: HTMLInputElement;
     get value(): string;
     set value(value: string);
     constructor();
@@ -31,6 +32,8 @@ export declare class LitMarkdownEditor extends LitElement {
     protected handleHeaderClick: EventListener;
     protected handleModifierClick: EventListener;
     protected handleTemplateClick: EventListener;
+    protected handleAddPictureClick: EventListener;
+    private handleFileInput;
     protected triggerInputEvent(): void;
     static styles: import("lit").CSSResult[];
     renderToLightDom(): void;
