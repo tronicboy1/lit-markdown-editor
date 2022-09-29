@@ -29,6 +29,7 @@ export const markdownStyles = css`
   li {
     padding: 0.5rem;
     margin: 0;
+    color: black;
     cursor: pointer;
     border-radius: var(--radius);
     max-height: 35px;
