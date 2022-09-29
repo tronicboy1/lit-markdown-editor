@@ -27,6 +27,7 @@ export declare class LitMarkdownEditor extends LitElement {
     constructor();
     connectedCallback(): void;
     protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void;
+    disconnectedCallback(): void;
     protected handleHeaderClick: EventListener;
     protected handleModifierClick: EventListener;
     protected handleTemplateClick: EventListener;
