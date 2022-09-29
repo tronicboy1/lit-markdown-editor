@@ -28,6 +28,8 @@ export const markdownStyles = css`
   }
 
   li {
+    display: inline-flex;
+    align-items: center;
     padding: 0.5rem;
     margin: 0;
     color: black;
@@ -35,7 +37,6 @@ export const markdownStyles = css`
     border-radius: var(--radius);
     max-height: 35px;
     max-width: 38px;
-    display: flex;
   }
   li:hover {
     background-color: var(--secondary-color-hover);
