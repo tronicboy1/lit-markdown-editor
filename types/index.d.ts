@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement, PropertyValueMap } from "lit";
 export declare const tagName = "lit-markdown-editor";
 export declare class LitMarkdownEditor extends LitElement {
     #private;
@@ -9,6 +9,7 @@ export declare class LitMarkdownEditor extends LitElement {
     set value(value: string);
     constructor();
     connectedCallback(): void;
+    protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void;
     protected handleHeaderClick: EventListener;
     protected handleModifierClick: EventListener;
     protected handleTemplateClick: EventListener;
