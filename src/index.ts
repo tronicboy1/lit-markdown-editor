@@ -40,7 +40,7 @@ export class LitMarkdownEditor extends LitElement {
       ["i", "_"],
       ["b", "**"],
       ["table", "| A | B |" + "\n" + "| --- | --- |" + "\n" + "| a | b |"],
-      ["link", '[Pace]("https://www.pace-coffee.com")'],
+      ["link", '[URL]("https://")'],
     ]);
     loadComponent(tableIconTag, TableIcon);
     loadComponent(linkIconTag, LinkIcon);
