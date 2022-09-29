@@ -29,6 +29,7 @@ export const tagName = "lit-markdown-editor";
 @customElement(tagName)
 export class LitMarkdownEditor extends LitElement {
   #markdownMap: Map<string, string>;
+  #controller = new AbortController();
   @property({ attribute: "name" })
   public name = "";
   @property({ attribute: "required", type: Boolean })
@@ -71,10 +72,18 @@ export class LitMarkdownEditor extends LitElement {
   protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void {
     super.firstUpdated(_changedProperties);
     this.value = this.textContent ?? "";
-    this.textarea.addEventListener("input", () => {
-      this.triggerInputEvent();
-      this.renderToLightDom();
-    });
+    this.textarea.addEventListener(
+      "input",
+      () => {
+        this.renderToLightDom();
+      },
+      { signal: this.#controller.signal },
+    );
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.#controller.abort();
   }
 
   protected handleHeaderClick: EventListener = (event) => {
