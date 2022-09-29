@@ -48,6 +48,7 @@ export class LitMarkdownEditor extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    this.renderToLightDom();
     this.value = this.textContent ?? "";
     this.textarea.addEventListener("input", () => {
       this.triggerInputEvent();
