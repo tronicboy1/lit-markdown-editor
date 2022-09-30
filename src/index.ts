@@ -181,7 +181,8 @@ export class LitMarkdownEditor extends LitElement {
     const filesArray = Array.from(files);
     for (const file of filesArray) {
       const { type } = file;
-      if (!type.includes("image")) continue;
+      const regex = /(image|video)\/.*/;
+      if (!regex.test(type)) continue;
       this.handleFileRender(file);
     }
   };
