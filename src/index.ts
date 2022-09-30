@@ -40,6 +40,9 @@ export class LitMarkdownEditor extends LitElement {
   @query("input#add-file")
   protected fileInput!: HTMLInputElement;
 
+  /**
+   * Acts as an intermediate for this element to behave like a textarea.
+   */
   get value() {
     return this.textarea?.value ?? "";
   }
@@ -90,6 +93,9 @@ export class LitMarkdownEditor extends LitElement {
     this.#controller.abort();
   }
 
+  /**
+   * Renders header Markdown symbols into the textarea.
+   */
   protected handleHeaderClick: EventListener = (event) => {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
@@ -107,6 +113,10 @@ export class LitMarkdownEditor extends LitElement {
     this.triggerInputEvent();
   };
 
+  /**
+   * Handles a click to modifiers like italics.
+   * The textarea selection will be set to the middle of symbols.
+   */
   protected handleModifierClick: EventListener = (event) => {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
@@ -119,11 +129,14 @@ export class LitMarkdownEditor extends LitElement {
     )}${markdownSymbol} ${value.substring(selectionEnd)}`;
     this.textarea.value = newValue;
     this.textarea.focus();
-    const newSelectionStart = selectionStart + markdownSymbol.length;
+    const newSelectionStart = selectionStart + markdownSymbol.length + 1;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
     this.triggerInputEvent();
   };
 
+  /**
+   * Renders templates when a template icon is clicked.
+   */
   protected handleTemplateClick: EventListener = (event) => {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
@@ -139,15 +152,45 @@ export class LitMarkdownEditor extends LitElement {
     this.triggerInputEvent();
   };
 
+  /**
+   * Opens file selection dialogue on a click to the add picture icon.
+   */
   protected handleAddPictureClick: EventListener = () => {
     this.fileInput.click();
   };
 
-  private handleFileInput: EventListener = () => {
+  /**
+   * Handles file input when add picture button is clicked
+   */
+  protected handleFileInput: EventListener = () => {
     const { files } = this.fileInput;
     if (!files) throw Error("No files object was found on input");
     const file = files[0];
     if (!file || file.size === 0) return;
+    this.handleFileRender(file);
+  };
+
+  /**
+   * Handles a file drop on the textarea element.
+   * Can render multiple files at once.
+   */
+  protected handleDrop = (event: DragEvent) => {
+    event.preventDefault();
+    if (!event.dataTransfer) return;
+    const { files } = event.dataTransfer;
+    const filesArray = Array.from(files);
+    for (const file of filesArray) {
+      const { type } = file;
+      if (!type.includes("image")) continue;
+      this.handleFileRender(file);
+    }
+  };
+
+  /**
+   * Renders a file to the text area as markdown text.
+   * By default, this function will also register the image as an Object URL so it may be displayed in an img tag.
+   */
+  protected handleFileRender = (file: File) => {
     const objectURL = URL.createObjectURL(file);
     const markdown = `![${file.name}](${objectURL} "${file.name}")`;
     const { selectionStart, selectionEnd, value } = this.textarea;
@@ -157,14 +200,24 @@ export class LitMarkdownEditor extends LitElement {
     this.textarea.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
     this.triggerInputEvent();
     this.renderToLightDom();
+    this.textarea.focus();
+    const newSelectionStart = selectionStart + markdown.length + 1;
+    this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
   };
 
+  /**
+   * Triggers input event on button clicks.
+   */
   protected triggerInputEvent() {
     this.dispatchEvent(new Event("input", { composed: true }));
   }
 
   static styles = [globalStyles, formStyles, markdownStyles];
 
+  /**
+   * Renders a hidden textarea to the lightdom so this element can be used with forms.
+   * Will use element internals later.
+   */
   renderToLightDom() {
     render(
       html`<textarea slot="input" name=${this.name} hidden .value=${this.value} ?required=${this.required}></textarea>`,
@@ -195,7 +248,7 @@ export class LitMarkdownEditor extends LitElement {
           </li>
         </ul>
       </nav>
-      <textarea name=${this.name} autocomplete="off" maxlength="5000"></textarea>
+      <textarea name=${this.name} autocomplete="off" maxlength="5000" @drop=${this.handleDrop}></textarea>
       <slot name="input"></slot>
     `;
   }

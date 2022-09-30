@@ -155,4 +155,4 @@ You can load initial values by dumping text data inside the `<lit-markdown-edito
 
 The add image button will add your image as a data object string by default.
 
-If you wish to change the logic of the add image button, please create a custom class and modify the `protected handleHeaderClick` EventListener.
+If you wish to change the logic of the add image button, please create a custom class and modify the `protected handleFileRender` EventListener.

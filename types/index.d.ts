@@ -33,7 +33,9 @@ export declare class LitMarkdownEditor extends LitElement {
     protected handleModifierClick: EventListener;
     protected handleTemplateClick: EventListener;
     protected handleAddPictureClick: EventListener;
-    private handleFileInput;
+    protected handleFileInput: EventListener;
+    protected handleDrop: (event: DragEvent) => void;
+    protected handleFileRender: (file: File) => void;
     protected triggerInputEvent(): void;
     static styles: import("lit").CSSResult[];
     renderToLightDom(): void;
