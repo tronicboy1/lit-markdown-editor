@@ -1,5 +1,5 @@
 import { html, LitElement, PropertyValueMap, render } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { tagName as tableIconTag, TableIcon } from "./icons/table-icon.js";
 import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon.js";
 import { loadComponent } from "./helpers/index.js";
@@ -7,6 +7,7 @@ import { globalStyles } from "./styles/index.js";
 import formStyles from "./styles/form.js";
 import { markdownStyles } from "./styles/markdown.js";
 import { tagName as newPictureIconTagName, NewPictureIcon } from "./icons/new-picture-icon.js";
+import { tagName as loadingIconTagName, LoadingIcon } from "./icons/loading-icon.js";
 
 export const tagName = "lit-markdown-editor";
 
@@ -31,6 +32,8 @@ export const tagName = "lit-markdown-editor";
 export class LitMarkdownEditor extends LitElement {
   #markdownMap: Map<string, string>;
   #controller = new AbortController();
+  @state()
+  protected loading = false;
   @property({ attribute: "name" })
   public name = "";
   @property({ attribute: "required", type: Boolean })
@@ -69,6 +72,7 @@ export class LitMarkdownEditor extends LitElement {
     loadComponent(tableIconTag, TableIcon);
     loadComponent(linkIconTag, LinkIcon);
     loadComponent(newPictureIconTagName, NewPictureIcon);
+    loadComponent(loadingIconTagName, LoadingIcon);
   }
 
   connectedCallback(): void {
@@ -156,6 +160,7 @@ export class LitMarkdownEditor extends LitElement {
    * Opens file selection dialogue on a click to the add picture icon.
    */
   protected handleAddPictureClick: EventListener = () => {
+    if (this.loading) return;
     this.fileInput.click();
   };
 
@@ -167,7 +172,10 @@ export class LitMarkdownEditor extends LitElement {
     if (!files) throw Error("No files object was found on input");
     const file = files[0];
     if (!file || file.size === 0) return;
-    this.handleFileRender(file);
+    this.loading = true;
+    this.handleFileRender(file).finally(() => {
+      this.loading = false;
+    });
   };
 
   /**
@@ -176,22 +184,24 @@ export class LitMarkdownEditor extends LitElement {
    */
   protected handleDrop = (event: DragEvent) => {
     event.preventDefault();
-    if (!event.dataTransfer) return;
+    if (this.loading || !event.dataTransfer) return;
     const { files } = event.dataTransfer;
     const filesArray = Array.from(files);
-    for (const file of filesArray) {
-      const { type } = file;
-      const regex = /(image|video)\/.*/;
-      if (!regex.test(type)) continue;
-      this.handleFileRender(file);
-    }
+    const regex = /(image|video)\/.*/;
+    const filteredFiles = filesArray.filter(({ type }) => regex.test(type));
+    this.loading = true;
+    Promise.all(filteredFiles.map((file) => this.handleFileRender(file))).finally(() => {
+      this.loading = false;
+    });
   };
 
   /**
    * Renders a file to the text area as markdown text.
    * By default, this function will also register the image as an Object URL so it may be displayed in an img tag.
+   * This function is intentionally created to return a promise for use with async uploads.
+   * If you do not require async handling, simply return a Promise.resolve().
    */
-  protected handleFileRender = (file: File) => {
+  protected handleFileRender = (file: File): Promise<any> => {
     const objectURL = URL.createObjectURL(file);
     const markdown = `![${file.name}](${objectURL} "${file.name}")`;
     const { selectionStart, selectionEnd, value } = this.textarea;
@@ -204,6 +214,7 @@ export class LitMarkdownEditor extends LitElement {
     this.textarea.focus();
     const newSelectionStart = selectionStart + markdown.length + 1;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+    return Promise.resolve();
   };
 
   /**
@@ -245,7 +256,9 @@ export class LitMarkdownEditor extends LitElement {
             <link-icon></link-icon>
           </li>
           <li @click=${this.handleAddPictureClick} style="position: relative;">
-            <new-picture-icon></new-picture-icon>
+            ${this.loading
+              ? html`<loading-icon small black></loading-icon>`
+              : html`<new-picture-icon></new-picture-icon>`}
           </li>
         </ul>
       </nav>

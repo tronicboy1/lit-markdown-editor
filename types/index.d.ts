@@ -19,6 +19,7 @@ export declare const tagName = "lit-markdown-editor";
  */
 export declare class LitMarkdownEditor extends LitElement {
     #private;
+    protected loading: boolean;
     name: string;
     required: boolean;
     protected textarea: HTMLTextAreaElement;
@@ -61,8 +62,10 @@ export declare class LitMarkdownEditor extends LitElement {
     /**
      * Renders a file to the text area as markdown text.
      * By default, this function will also register the image as an Object URL so it may be displayed in an img tag.
+     * This function is intentionally created to return a promise for use with async uploads.
+     * If you do not require async handling, simply return a Promise.resolve().
      */
-    protected handleFileRender: (file: File) => void;
+    protected handleFileRender: (file: File) => Promise<any>;
     /**
      * Triggers input event on button clicks.
      */
