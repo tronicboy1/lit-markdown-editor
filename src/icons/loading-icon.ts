@@ -1,11 +1,9 @@
 import { LitElement, html, css } from "lit";
-import { customElement } from "lit/decorators.js";
 import iconStyles from "../styles/icon.js";
 
 
 export const tagName = "loading-icon";
 
-@customElement(tagName)
 export class LoadingIcon extends LitElement {
   static styles = [
     iconStyles,

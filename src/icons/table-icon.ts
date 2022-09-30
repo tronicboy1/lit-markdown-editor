@@ -1,10 +1,8 @@
 import { html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
 import iconStyles from "../styles/icon.js";
 
 export const tagName = "table-icon";
 
-@customElement(tagName)
 export class TableIcon extends LitElement {
   static styles = [iconStyles];
   render() {
