@@ -19,20 +19,24 @@ export declare const tagName = "lit-markdown-editor";
  */
 export declare class LitMarkdownEditor extends LitElement {
     #private;
+    private markdownMap;
+    private controller;
+    private internals;
+    static formAssociated: boolean;
     protected loading: boolean;
     name: string;
     minlength: string;
     maxlength: string;
-    required: boolean;
     protected textarea: HTMLTextAreaElement;
     protected fileInput: HTMLInputElement;
+    get required(): boolean;
+    set required(newVal: boolean);
     /**
      * Acts as an intermediate for this element to behave like a textarea.
      */
     get value(): string;
     set value(value: string);
     constructor();
-    connectedCallback(): void;
     protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void;
     disconnectedCallback(): void;
     /**

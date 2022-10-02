@@ -32,6 +32,9 @@ export const tagName = "lit-markdown-editor";
 export class LitMarkdownEditor extends LitElement {
   private markdownMap: Map<string, string>;
   private controller = new AbortController();
+  private internals: ReturnType<InstanceType<typeof HTMLElement>["attachInternals"]> | null; // Not supported in safari.
+
+  static formAssociated = true;
 
   @state()
   protected loading = false;
@@ -41,12 +44,20 @@ export class LitMarkdownEditor extends LitElement {
   public minlength = "";
   @property({ attribute: "maxlength" })
   public maxlength = "";
-  @property({ attribute: "required", type: Boolean })
-  public required = false;
   @query("textarea")
   protected textarea!: HTMLTextAreaElement;
   @query("input#add-file")
   protected fileInput!: HTMLInputElement;
+  #required = false;
+  @property({ attribute: "required", type: Boolean })
+  public get required() {
+    return this.#required;
+  }
+  public set required(newVal: boolean) {
+    this.#required = newVal;
+    this.internals && (this.internals.ariaRequired = String(this.required));
+    this.renderToLightDom();
+  }
 
   /**
    * Acts as an intermediate for this element to behave like a textarea.
@@ -63,6 +74,8 @@ export class LitMarkdownEditor extends LitElement {
 
   constructor() {
     super();
+    const elementInternalsSupported = "attachInternals" in this;
+    this.internals = elementInternalsSupported ? this.attachInternals() : null;
     this.markdownMap = new Map([
       ["h1", "#"],
       ["h2", "##"],
@@ -80,14 +93,10 @@ export class LitMarkdownEditor extends LitElement {
     loadComponent(loadingIconTagName, LoadingIcon);
   }
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.renderToLightDom();
-  }
-
   protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void {
     super.firstUpdated(_changedProperties);
     this.value = this.textContent ?? "";
+    this.renderToLightDom();
     this.textarea.addEventListener(
       "input",
       () => {
@@ -236,10 +245,38 @@ export class LitMarkdownEditor extends LitElement {
    * Will use element internals later.
    */
   renderToLightDom() {
-    render(
-      html`<textarea slot="input" name=${this.name} hidden .value=${this.value} ?required=${this.required}></textarea>`,
-      this,
-    );
+    if (!this.textarea) return; // Do not allow render until element is fully loaded.
+    if (!this.internals) {
+      render(
+        html`<textarea
+          slot="input"
+          name=${this.name}
+          hidden
+          .value=${this.value}
+          ?required=${this.required}
+        ></textarea>`,
+        this,
+      );
+      return;
+    }
+    this.internals.setFormValue(this.value);
+    if (this.required && this.value.length === 0)
+      return this.internals.setValidity({ valueMissing: true }, "Editor is empty.", this.textarea);
+    const maxlengthNum = Number(this.maxlength);
+    if (Boolean(maxlengthNum) && this.value.length > maxlengthNum)
+      return this.internals.setValidity(
+        { tooLong: true },
+        `Max character length is ${this.maxlength} characters. Current character length is ${this.value.length}.`,
+        this.textarea,
+      );
+    const minlengthNum = Number(this.minlength);
+    if (Boolean(minlengthNum) && this.value.length < minlengthNum)
+      return this.internals.setValidity(
+        { tooShort: true },
+        `At least ${this.minlength} characters are required.`,
+        this.textarea,
+      );
+    this.internals.setValidity({});
   }
 
   render() {
@@ -267,13 +304,7 @@ export class LitMarkdownEditor extends LitElement {
           </li>
         </ul>
       </nav>
-      <textarea
-        name=${this.name}
-        autocomplete="off"
-        maxlength=${this.maxlength}
-        minlength=${this.minlength}
-        @drop=${this.handleDrop}
-      ></textarea>
+      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop}></textarea>
       <slot name="input"></slot>
     `;
   }

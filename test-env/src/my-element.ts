@@ -14,9 +14,22 @@ export class MyElement extends LitElement {
     super();
     //window.customElements.define(tagName, LitMarkdownEditor);
   }
+
+  private handleFormSubmit: EventListener = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+    const markdown = formData.get("markdown");
+    console.log(markdown);
+  };
+
   render() {
-    return html`<lit-markdown-editor></lit-markdown-editor>`;
+    return html`<form @submit=${this.handleFormSubmit}>
+      <lit-markdown-editor name="markdown" required minlength=10 maxlength=20></lit-markdown-editor>
+      <button type="submit">Submit</button>
+    </form>`;
   }
+
   static styles = css`
     :host {
       max-width: 1280px;
