@@ -30,8 +30,9 @@ export const tagName = "lit-markdown-editor";
  */
 @customElement(tagName)
 export class LitMarkdownEditor extends LitElement {
-  #markdownMap: Map<string, string>;
-  #controller = new AbortController();
+  private markdownMap: Map<string, string>;
+  private controller = new AbortController();
+
   @state()
   protected loading = false;
   @property({ attribute: "name" })
@@ -62,7 +63,7 @@ export class LitMarkdownEditor extends LitElement {
 
   constructor() {
     super();
-    this.#markdownMap = new Map([
+    this.markdownMap = new Map([
       ["h1", "#"],
       ["h2", "##"],
       ["h3", "###"],
@@ -92,13 +93,13 @@ export class LitMarkdownEditor extends LitElement {
       () => {
         this.renderToLightDom();
       },
-      { signal: this.#controller.signal },
+      { signal: this.controller.signal },
     );
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.#controller.abort();
+    this.controller.abort();
   }
 
   /**
@@ -108,7 +109,7 @@ export class LitMarkdownEditor extends LitElement {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
     const id = target.id;
-    const markdownSymbol = this.#markdownMap.get(id) ?? "";
+    const markdownSymbol = this.markdownMap.get(id) ?? "";
     const { selectionStart, value } = this.textarea;
     const isFullParagraph = selectionStart ? value.at(selectionStart - 1) === "\n" : true;
     const newValue = `${value.substring(0, selectionStart)}${
@@ -129,7 +130,7 @@ export class LitMarkdownEditor extends LitElement {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
     const id = target.id;
-    const markdownSymbol = this.#markdownMap.get(id) ?? "";
+    const markdownSymbol = this.markdownMap.get(id) ?? "";
     const { selectionStart, selectionEnd, value } = this.textarea;
     const newValue = `${value.substring(0, selectionStart)} ${markdownSymbol}${value.substring(
       selectionStart,
@@ -149,7 +150,7 @@ export class LitMarkdownEditor extends LitElement {
     const target = event.currentTarget;
     if (!(target instanceof HTMLElement)) throw TypeError();
     const id = target.id;
-    const markdownSymbol = this.#markdownMap.get(id) ?? "";
+    const markdownSymbol = this.markdownMap.get(id) ?? "";
     const { selectionStart, value } = this.textarea;
     const newLine = "\n";
     const newValue =
