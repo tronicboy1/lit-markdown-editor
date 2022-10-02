@@ -36,6 +36,10 @@ export class LitMarkdownEditor extends LitElement {
   protected loading = false;
   @property({ attribute: "name" })
   public name = "";
+  @property({ attribute: "minlength" })
+  public minlength = "";
+  @property({ attribute: "maxlength" })
+  public maxlength = "";
   @property({ attribute: "required", type: Boolean })
   public required = false;
   @query("textarea")
@@ -262,7 +266,13 @@ export class LitMarkdownEditor extends LitElement {
           </li>
         </ul>
       </nav>
-      <textarea name=${this.name} autocomplete="off" maxlength="5000" @drop=${this.handleDrop}></textarea>
+      <textarea
+        name=${this.name}
+        autocomplete="off"
+        maxlength=${this.maxlength}
+        minlength=${this.minlength}
+        @drop=${this.handleDrop}
+      ></textarea>
       <slot name="input"></slot>
     `;
   }

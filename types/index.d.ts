@@ -21,6 +21,8 @@ export declare class LitMarkdownEditor extends LitElement {
     #private;
     protected loading: boolean;
     name: string;
+    minlength: string;
+    maxlength: string;
     required: boolean;
     protected textarea: HTMLTextAreaElement;
     protected fileInput: HTMLInputElement;
