@@ -70,6 +70,7 @@ export class LitMarkdownEditor extends LitElement {
     if (!this.textarea) throw Error("Cannot set textarea value before render.");
     this.textarea.value = value;
     this.renderToLightDom();
+    this.triggerInputEvent();
   }
 
   constructor() {
@@ -124,11 +125,10 @@ export class LitMarkdownEditor extends LitElement {
     const newValue = `${value.substring(0, selectionStart)}${
       isFullParagraph ? "" : "\n"
     }${markdownSymbol} ${value.substring(selectionStart)}`;
-    this.textarea.value = newValue;
+    this.value = newValue;
     this.textarea.focus();
     const newSelectionStart = selectionStart + markdownSymbol.length + 2;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
-    this.triggerInputEvent();
   };
 
   /**
@@ -145,11 +145,10 @@ export class LitMarkdownEditor extends LitElement {
       selectionStart,
       selectionEnd,
     )}${markdownSymbol} ${value.substring(selectionEnd)}`;
-    this.textarea.value = newValue;
+    this.value = newValue;
     this.textarea.focus();
     const newSelectionStart = selectionStart + markdownSymbol.length + 1;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
-    this.triggerInputEvent();
   };
 
   /**
@@ -164,10 +163,9 @@ export class LitMarkdownEditor extends LitElement {
     const newLine = "\n";
     const newValue =
       value.substring(0, selectionStart) + newLine + markdownSymbol + newLine + value.substring(selectionStart);
-    this.textarea.value = newValue;
+    this.value = newValue;
     this.textarea.focus();
     this.textarea.setSelectionRange(selectionStart, selectionStart);
-    this.triggerInputEvent();
   };
 
   /**
@@ -181,7 +179,8 @@ export class LitMarkdownEditor extends LitElement {
   /**
    * Handles file input when add picture button is clicked
    */
-  protected handleFileInput: EventListener = () => {
+  protected handleFileInput: EventListener = (event) => {
+    event.stopPropagation(); // stop input event from bleeding through to light DOM
     const { files } = this.fileInput;
     if (!files) throw Error("No files object was found on input");
     const file = files[0];
@@ -189,6 +188,7 @@ export class LitMarkdownEditor extends LitElement {
     this.loading = true;
     this.handleFileRender(file).finally(() => {
       this.loading = false;
+      this.fileInput.value = "";
     });
   };
 
@@ -222,9 +222,7 @@ export class LitMarkdownEditor extends LitElement {
     const textUntilSelectionStart = value.substring(0, selectionStart);
     const textAfterSelectionEnd = value.substring(selectionEnd);
     const newLine = "\n";
-    this.textarea.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
-    this.triggerInputEvent();
-    this.renderToLightDom();
+    this.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
     this.textarea.focus();
     const newSelectionStart = selectionStart + markdown.length + 1;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);

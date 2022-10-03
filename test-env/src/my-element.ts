@@ -25,7 +25,7 @@ export class MyElement extends LitElement {
 
   render() {
     return html`<form @submit=${this.handleFormSubmit}>
-      <lit-markdown-editor name="markdown" required minlength=10 maxlength=20></lit-markdown-editor>
+      <lit-markdown-editor @input=${() => console.log("editor input")} name="markdown" required minlength=10 maxlength=20></lit-markdown-editor>
       <button type="submit">Submit</button>
     </form>`;
   }
