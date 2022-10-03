@@ -231,15 +231,8 @@ export class LitMarkdownEditor extends LitElement {
    */
   private renderImageToTextArea(file: File, url: string) {
     const markdown = `![${file.name}](${url} "${file.name}")`;
-    const { selectionStart, selectionEnd, value } = this.textarea;
-    const textUntilSelectionStart = value.substring(0, selectionStart);
-    const textAfterSelectionEnd = value.substring(selectionEnd);
-    const newLine = "\n";
-    this.value = textUntilSelectionStart + newLine + markdown + textAfterSelectionEnd + newLine;
-    this.textarea.focus();
-    const newSelectionStart = selectionStart + markdown.length + 1;
-    this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
-    return Promise.resolve();
+    const padding = markdown.length + 1;
+    this.appendTextToTextArea(markdown, padding);
   }
 
   /**

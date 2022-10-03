@@ -40,6 +40,11 @@ export declare class LitMarkdownEditor extends LitElement {
     protected firstUpdated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>): void;
     disconnectedCallback(): void;
     /**
+     * Appends text to textarea.
+     * Uses deprecated execCommand if available and defaults to substitution if fails.
+     */
+    private appendTextToTextArea;
+    /**
      * Renders header Markdown symbols into the textarea.
      */
     protected handleHeaderClick: EventListener;
@@ -66,12 +71,14 @@ export declare class LitMarkdownEditor extends LitElement {
      */
     protected handleDrop: (event: DragEvent) => void;
     /**
-     * Renders a file to the text area as markdown text.
-     * By default, this function will also register the image as an Object URL so it may be displayed in an img tag.
-     * This function is intentionally created to return a promise for use with async uploads.
-     * If you do not require async handling, simply return a Promise.resolve().
+     * Renders a file to the text area as markdown text with a link to the objects URL.
      */
-    protected handleFileRender: (file: File) => Promise<any>;
+    private renderImageToTextArea;
+    /**
+     * Processes a file for uploading to hosting provider before being rendered in the text editor.
+     * By default, will simply return an object URL for the file.
+     */
+    protected provideFileURL(file: File): Promise<string>;
     /**
      * Triggers input event on button clicks.
      */
