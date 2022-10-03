@@ -113,6 +113,27 @@ export class LitMarkdownEditor extends LitElement {
   }
 
   /**
+   * Appends text to textarea.
+   * Uses deprecated execCommand if available and defaults to substitution if fails.
+   */
+  private appendTextToTextArea(textToAdd: string, selectionPadding = 1) {
+    const { selectionStart, selectionEnd, value } = this.textarea;
+    const execCommandSupported = "execCommand" in document;
+    if (execCommandSupported) {
+      this.textarea.focus();
+      this.textarea.setSelectionRange(selectionStart, selectionEnd);
+      const succeeded = document.execCommand("insertText", false, textToAdd);
+      if (succeeded) return;
+    }
+    const textUntilSelectionStart = value.substring(0, selectionStart);
+    const textAfterSelectionEnd = value.substring(selectionEnd);
+    this.value = textUntilSelectionStart + textToAdd + textAfterSelectionEnd;
+    this.textarea.focus();
+    const newSelectionStart = selectionStart + selectionPadding;
+    this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+  }
+
+  /**
    * Renders header Markdown symbols into the textarea.
    */
   protected handleHeaderClick: EventListener = (event) => {
@@ -122,13 +143,9 @@ export class LitMarkdownEditor extends LitElement {
     const markdownSymbol = this.markdownMap.get(id) ?? "";
     const { selectionStart, value } = this.textarea;
     const isFullParagraph = selectionStart ? value.at(selectionStart - 1) === "\n" : true;
-    const newValue = `${value.substring(0, selectionStart)}${
-      isFullParagraph ? "" : "\n"
-    }${markdownSymbol} ${value.substring(selectionStart)}`;
-    this.value = newValue;
-    this.textarea.focus();
-    const newSelectionStart = selectionStart + markdownSymbol.length + 2;
-    this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+    const newText = `${isFullParagraph ? "" : "\n"}${markdownSymbol} `;
+    const padding = markdownSymbol.length + 2;
+    this.appendTextToTextArea(newText, padding);
   };
 
   /**
