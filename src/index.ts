@@ -118,18 +118,21 @@ export class LitMarkdownEditor extends LitElement {
    */
   private appendTextToTextArea(textToAdd: string, selectionPadding = 1) {
     const { selectionStart, selectionEnd, value } = this.textarea;
+    const newSelectionStart = selectionStart + selectionPadding;
     const execCommandSupported = "execCommand" in document;
     if (execCommandSupported) {
       this.textarea.focus();
       this.textarea.setSelectionRange(selectionStart, selectionEnd);
       const succeeded = document.execCommand("insertText", false, textToAdd);
-      if (succeeded) return;
+      if (succeeded) {
+        this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+        return;
+      }
     }
     const textUntilSelectionStart = value.substring(0, selectionStart);
     const textAfterSelectionEnd = value.substring(selectionEnd);
     this.value = textUntilSelectionStart + textToAdd + textAfterSelectionEnd;
     this.textarea.focus();
-    const newSelectionStart = selectionStart + selectionPadding;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
   }
 
@@ -158,14 +161,9 @@ export class LitMarkdownEditor extends LitElement {
     const id = target.id;
     const markdownSymbol = this.markdownMap.get(id) ?? "";
     const { selectionStart, selectionEnd, value } = this.textarea;
-    const newValue = `${value.substring(0, selectionStart)} ${markdownSymbol}${value.substring(
-      selectionStart,
-      selectionEnd,
-    )}${markdownSymbol} ${value.substring(selectionEnd)}`;
-    this.value = newValue;
-    this.textarea.focus();
-    const newSelectionStart = selectionStart + markdownSymbol.length + 1;
-    this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+    const newValue = ` ${markdownSymbol}${value.substring(selectionStart, selectionEnd)}${markdownSymbol} `;
+    const padding = markdownSymbol.length + 1;
+    this.appendTextToTextArea(newValue, padding);
   };
 
   /**
