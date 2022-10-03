@@ -215,7 +215,8 @@ export class LitMarkdownEditor extends LitElement {
    * This function is intentionally created to return a promise for use with async uploads.
    * If you do not require async handling, simply return a Promise.resolve().
    */
-  protected handleFileRender = (file: File): Promise<any> => {
+
+  protected handleFileRender = (file: File): /* eslint-disable */ Promise<any> /* eslint-disable */ => {
     const objectURL = URL.createObjectURL(file);
     const markdown = `![${file.name}](${objectURL} "${file.name}")`;
     const { selectionStart, selectionEnd, value } = this.textarea;
