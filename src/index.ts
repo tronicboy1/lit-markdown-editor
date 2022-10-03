@@ -174,13 +174,9 @@ export class LitMarkdownEditor extends LitElement {
     if (!(target instanceof HTMLElement)) throw TypeError();
     const id = target.id;
     const markdownSymbol = this.markdownMap.get(id) ?? "";
-    const { selectionStart, value } = this.textarea;
     const newLine = "\n";
-    const newValue =
-      value.substring(0, selectionStart) + newLine + markdownSymbol + newLine + value.substring(selectionStart);
-    this.value = newValue;
-    this.textarea.focus();
-    this.textarea.setSelectionRange(selectionStart, selectionStart);
+    const newValue = newLine + markdownSymbol + newLine;
+    this.appendTextToTextArea(newValue);
   };
 
   /**
