@@ -197,10 +197,12 @@ export class LitMarkdownEditor extends LitElement {
     const file = files[0];
     if (!file || file.size === 0) return;
     this.loading = true;
-    this.handleFileRender(file).finally(() => {
-      this.loading = false;
-      this.fileInput.value = "";
-    });
+    this.provideFileURL(file)
+      .then((url) => this.renderImageToTextArea(file, url))
+      .finally(() => {
+        this.loading = false;
+        this.fileInput.value = "";
+      });
   };
 
   /**
@@ -215,21 +217,20 @@ export class LitMarkdownEditor extends LitElement {
     const regex = /(image|video)\/.*/;
     const filteredFiles = filesArray.filter(({ type }) => regex.test(type));
     this.loading = true;
-    Promise.all(filteredFiles.map((file) => this.handleFileRender(file))).finally(() => {
+    Promise.all(
+      filteredFiles.map((file) => {
+        return this.provideFileURL(file).then((url) => this.renderImageToTextArea(file, url));
+      }),
+    ).finally(() => {
       this.loading = false;
     });
   };
 
   /**
-   * Renders a file to the text area as markdown text.
-   * By default, this function will also register the image as an Object URL so it may be displayed in an img tag.
-   * This function is intentionally created to return a promise for use with async uploads.
-   * If you do not require async handling, simply return a Promise.resolve().
+   * Renders a file to the text area as markdown text with a link to the objects URL.
    */
-
-  protected handleFileRender = (file: File): /* eslint-disable */ Promise<any> /* eslint-disable */ => {
-    const objectURL = URL.createObjectURL(file);
-    const markdown = `![${file.name}](${objectURL} "${file.name}")`;
+  private renderImageToTextArea(file: File, url: string) {
+    const markdown = `![${file.name}](${url} "${file.name}")`;
     const { selectionStart, selectionEnd, value } = this.textarea;
     const textUntilSelectionStart = value.substring(0, selectionStart);
     const textAfterSelectionEnd = value.substring(selectionEnd);
@@ -239,7 +240,16 @@ export class LitMarkdownEditor extends LitElement {
     const newSelectionStart = selectionStart + markdown.length + 1;
     this.textarea.setSelectionRange(newSelectionStart, newSelectionStart);
     return Promise.resolve();
-  };
+  }
+
+  /**
+   * Processes a file for uploading to hosting provider before being rendered in the text editor.
+   * By default, will simply return an object URL for the file.
+   */
+  protected provideFileURL(file: File): Promise<string> {
+    const objectURL = URL.createObjectURL(file);
+    return Promise.resolve(objectURL);
+  }
 
   /**
    * Triggers input event on button clicks.

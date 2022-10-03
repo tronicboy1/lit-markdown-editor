@@ -102,6 +102,7 @@ import { html } from "lit";
 export class CustomMarkdownEditor extends LitMarkdownEditor {
   render() {
     return html`
+      <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*" />
       <nav>
         <ul>
           <li @click=${this.handleHeaderClick} id="h1">H1</li>
@@ -117,9 +118,14 @@ export class CustomMarkdownEditor extends LitMarkdownEditor {
           <li @click=${this.handleTemplateClick} id="link">
             <link-icon></link-icon>
           </li>
+          <li @click=${this.handleAddPictureClick} style="position: relative;">
+            ${this.loading
+              ? html`<loading-icon small black></loading-icon>`
+              : html`<new-picture-icon></new-picture-icon>`}
+          </li>
         </ul>
       </nav>
-      <textarea name=${this.name} autocomplete="off" maxlength="5000"></textarea>
+      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop}></textarea>
       <slot name="input"></slot>
     `;
   }
@@ -155,4 +161,4 @@ You can load initial values by dumping text data inside the `<lit-markdown-edito
 
 The add image button will add your image as a data object string by default.
 
-If you wish to change the logic of the add image button, please create a custom class and modify the `protected handleFileRender` EventListener.
+If you wish to change the logic of the add image button, please create a custom class and modify the `protected provideFileURL` function, returning a Promise of the URL of the image you added.
