@@ -292,6 +292,26 @@ export class LitMarkdownEditor extends LitElement {
     this.internals.setValidity({});
   }
 
+  /**
+   * Handles keydown event and adds a new line for lists.
+   */
+  private handleKeydown = (event: KeyboardEvent) => {
+    if (event.isComposing) return;
+    if (event.key !== "Enter") return;
+    const { selectionStart, value } = this.textarea;
+    const startOfParagraph = value.lastIndexOf("\n", selectionStart - 2);
+    const currentParagraph = value.slice(startOfParagraph + 1, selectionStart);
+    const olRegex = /^([1-9][0-9]*). .+/;
+    const isOl = currentParagraph.match(olRegex);
+    const ulRegex = / - .+/;
+    const isUl = currentParagraph.match(ulRegex);
+    if (isOl || isUl) {
+      event.preventDefault();
+      const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
+      this.appendTextToTextArea(symbol, symbol.length + 1);
+    }
+  };
+
   render() {
     return html`
       <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*" />
@@ -317,7 +337,7 @@ export class LitMarkdownEditor extends LitElement {
           </li>
         </ul>
       </nav>
-      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop}></textarea>
+      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop} @keydown=${this.handleKeydown}></textarea>
       <slot name="input"></slot>
     `;
   }

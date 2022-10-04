@@ -89,6 +89,10 @@ export declare class LitMarkdownEditor extends LitElement {
      * Will use element internals later.
      */
     renderToLightDom(): void;
+    /**
+     * Handles keydown event and adds a new line for lists.
+     */
+    private handleKeydown;
     render(): import("lit-html").TemplateResult<1>;
 }
 declare global {
