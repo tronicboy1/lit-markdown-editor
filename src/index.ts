@@ -314,7 +314,7 @@ export class LitMarkdownEditor extends LitElement {
     if (isOl || isUl) {
       event.preventDefault();
       const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
-      this.appendTextToTextArea(symbol, symbol.length + 1);
+      this.appendTextToTextArea(symbol, symbol.length);
     }
   };
 
