@@ -80,7 +80,7 @@ export declare class LitMarkdownEditor extends LitElement {
      * Processes a file for uploading to hosting provider before being rendered in the text editor.
      * By default, will simply return an object URL for the file.
      */
-    protected provideFileURL(file: File): Promise<string>;
+    protected provideFileURL(file: Parameters<typeof URL["createObjectURL"]>[0]): Promise<string>;
     /**
      * Triggers input event on button clicks.
      */

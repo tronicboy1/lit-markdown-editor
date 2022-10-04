@@ -204,13 +204,39 @@ export class LitMarkdownEditor extends LitElement {
     if (!files) throw Error("No files object was found on input");
     const file = files[0];
     if (!file || file.size === 0) return;
+    const isVideo = /video\/.*/.test(file.type);
     this.loading = true;
-    this.provideFileURL(file)
-      .then((url) => this.renderImageToTextArea(file, url))
-      .finally(() => {
-        this.loading = false;
-        this.fileInput.value = "";
-      });
+    if (isVideo) {
+      file.arrayBuffer().then((videoArrayBuffer) =>
+        import("@ffmpeg/ffmpeg").then(({ createFFmpeg, fetchFile }) => {
+          const ffmpeg = createFFmpeg({ log: true });
+          const newFileName = `output-${file.name.slice(0, 5)}.mp4`;
+          fetchFile(file)
+            .then((videoUintArray) =>
+              ffmpeg
+                .load()
+                .then(() => ffmpeg.FS("writeFile", file.name, videoUintArray))
+                .then(() => ffmpeg.run("-i", file.name, newFileName))
+                .then(() => ffmpeg.FS("readFile", newFileName))
+                .then((convertedUintArray) => {
+                  const blob = new Blob([convertedUintArray]);
+                  return this.provideFileURL(blob);
+                })
+                .then((url) => this.renderImageToTextArea(file, url)),
+            )
+            .finally(() => {
+              this.loading = false;
+              this.fileInput.value = "";
+            });
+        }),
+      );
+    }
+    // this.provideFileURL(file)
+    //   .then((url) => this.renderImageToTextArea(file, url))
+    //   .finally(() => {
+    //     this.loading = false;
+    //     this.fileInput.value = "";
+    //   });
   };
 
   /**
@@ -247,7 +273,7 @@ export class LitMarkdownEditor extends LitElement {
    * Processes a file for uploading to hosting provider before being rendered in the text editor.
    * By default, will simply return an object URL for the file.
    */
-  protected provideFileURL(file: File): Promise<string> {
+  protected provideFileURL(file: Parameters<typeof URL["createObjectURL"]>[0]): Promise<string> {
     const objectURL = URL.createObjectURL(file);
     return Promise.resolve(objectURL);
   }
@@ -329,7 +355,7 @@ export class LitMarkdownEditor extends LitElement {
 
   render() {
     return html`
-      <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*" />
+      <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*, video/*" />
       <nav>
         <ul>
           <li @click=${this.handleHeaderClick} id="h1">H1</li>
