@@ -51,6 +51,8 @@ export class LitMarkdownEditor extends LitElement {
   @query("input#add-file")
   protected fileInput!: HTMLInputElement;
   #required = false;
+  private enterKeyWasPressed = false;
+  private enterKeyResetTimeout = 0;
   @property({ attribute: "required", type: Boolean })
   public get required() {
     return this.#required;
@@ -85,8 +87,8 @@ export class LitMarkdownEditor extends LitElement {
       ["h3", "###"],
       ["h4", "####"],
       ["h5", "#####"],
-      ["ul", " - "],
-      ["ol", "1. "],
+      ["ul", " -"],
+      ["ol", "1."],
       ["i", "_"],
       ["b", "**"],
       ["table", "| A | B |" + "\n" + "| --- | --- |" + "\n" + "| a | b |"],
@@ -304,6 +306,11 @@ export class LitMarkdownEditor extends LitElement {
   private handleKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return;
     if (event.key !== "Enter") return;
+    if (this.enterKeyWasPressed && "execCommand" in document) {
+      this.enterKeyWasPressed = false;
+      clearTimeout(this.enterKeyResetTimeout);
+      return document.execCommand("undo");
+    }
     const { selectionStart, value } = this.textarea;
     const startOfParagraph = value.lastIndexOf("\n", selectionStart - 2);
     const currentParagraph = value.slice(startOfParagraph + 1, selectionStart);
@@ -315,6 +322,8 @@ export class LitMarkdownEditor extends LitElement {
       event.preventDefault();
       const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
       this.appendTextToTextArea(symbol, symbol.length);
+      this.enterKeyWasPressed = true;
+      this.enterKeyResetTimeout = setTimeout(() => (this.enterKeyWasPressed = false), 500);
     }
   };
 

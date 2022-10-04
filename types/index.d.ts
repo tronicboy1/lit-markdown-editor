@@ -29,6 +29,8 @@ export declare class LitMarkdownEditor extends LitElement {
     maxlength: string;
     protected textarea: HTMLTextAreaElement;
     protected fileInput: HTMLInputElement;
+    private enterKeyWasPressed;
+    private enterKeyResetTimeout;
     get required(): boolean;
     set required(newVal: boolean);
     /**
