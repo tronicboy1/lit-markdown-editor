@@ -92,7 +92,6 @@ export class LitMarkdownEditor extends LitElement {
       ["i", "_"],
       ["b", "**"],
       ["table", "| A | B |" + "\n" + "| --- | --- |" + "\n" + "| a | b |"],
-      ["link", "[URL](https://)"],
     ]);
     loadComponent(tableIconTag, TableIcon);
     loadComponent(linkIconTag, LinkIcon);
@@ -185,6 +184,13 @@ export class LitMarkdownEditor extends LitElement {
     const newLine = "\n";
     const newValue = newLine + markdownSymbol + newLine;
     this.appendTextToTextArea(newValue);
+  };
+
+  protected handleLinkClick: EventListener = () => {
+    const { selectionStart, selectionEnd, value } = this.textarea;
+    const selectedText = value.substring(selectionStart, selectionEnd);
+    const markdown = `[${selectedText ? selectedText : "URL"}](https://)`;
+    this.appendTextToTextArea(markdown);
   };
 
   /**
@@ -344,7 +350,7 @@ export class LitMarkdownEditor extends LitElement {
           <li @click=${this.handleTemplateClick} id="table">
             <table-icon></table-icon>
           </li>
-          <li @click=${this.handleTemplateClick} id="link">
+          <li @click=${this.handleLinkClick} id="link">
             <link-icon></link-icon>
           </li>
           <li @click=${this.handleAddPictureClick} style="position: relative;">
