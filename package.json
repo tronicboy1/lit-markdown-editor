@@ -1,6 +1,6 @@
 {
   "name": "lit-markdown-editor",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "A texteditor web component for writing markdown.",
   "main": "./lib/index.js",
   "type": "module",
