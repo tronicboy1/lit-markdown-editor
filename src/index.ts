@@ -51,8 +51,6 @@ export class LitMarkdownEditor extends LitElement {
   @query("input#add-file")
   protected fileInput!: HTMLInputElement;
   #required = false;
-  private enterKeyWasPressed = false;
-  private enterKeyResetTimeout = 0;
   @property({ attribute: "required", type: Boolean })
   public get required() {
     return this.#required;
@@ -312,24 +310,23 @@ export class LitMarkdownEditor extends LitElement {
   private handleKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return;
     if (event.key !== "Enter") return;
-    if (this.enterKeyWasPressed && "execCommand" in document) {
-      this.enterKeyWasPressed = false;
-      clearTimeout(this.enterKeyResetTimeout);
-      return document.execCommand("undo");
-    }
     const { selectionStart, value } = this.textarea;
     const startOfParagraph = value.lastIndexOf("\n", selectionStart - 2);
     const currentParagraph = value.slice(startOfParagraph + 1, selectionStart);
-    const olRegex = /^([1-9][0-9]*). .+/;
+    const olRegex = /^([1-9][0-9]*). [^\n ]+/;
     const isOl = currentParagraph.match(olRegex);
-    const ulRegex = / - .+/;
+    const ulRegex = / - [^\n ]+/;
     const isUl = currentParagraph.match(ulRegex);
-    if (isOl || isUl) {
+    const isEmptyUlOrOl = /^(([1-9][0-9]*).| -) +$/.test(currentParagraph);
+    if (isOl || isUl || isEmptyUlOrOl) {
       event.preventDefault();
+      if (isEmptyUlOrOl && "execCommand" in document) {
+        this.textarea.focus();
+        this.textarea.setSelectionRange(startOfParagraph + 1, selectionStart);
+        return document.execCommand("delete", false);
+      }
       const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
       this.appendTextToTextArea(symbol, symbol.length);
-      this.enterKeyWasPressed = true;
-      this.enterKeyResetTimeout = setTimeout(() => (this.enterKeyWasPressed = false), 500);
     }
   };
 
@@ -370,4 +367,7 @@ declare global {
   interface HTMLElementTagNameMap {
     "lit-markdown-editor": LitMarkdownEditor;
   }
+  // interface HTMLElementEventMap {
+  //   "my-event": CustomEvent<{ foo: number }>;
+  // }
 }

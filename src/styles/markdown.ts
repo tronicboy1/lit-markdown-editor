@@ -36,10 +36,14 @@ export const markdownStyles = css`
     border-radius: var(--radius);
     max-height: 35px;
     max-width: 38px;
+    min-width: 35px;
     user-select: none;
   }
   li:hover {
     background-color: var(--secondary-color-hover);
+  }
+  li em, li strong {
+    margin: 0 auto;
   }
 
   textarea {
