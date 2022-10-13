@@ -184,11 +184,16 @@ export class LitMarkdownEditor extends LitElement {
     this.appendTextToTextArea(newValue);
   };
 
+  /**
+   * Handles link icon click to wrap selected text in a URL markdown text.
+   */
   protected handleLinkClick: EventListener = () => {
     const { selectionStart, selectionEnd, value } = this.textarea;
     const selectedText = value.substring(selectionStart, selectionEnd);
     const markdown = `[${selectedText ? selectedText : "URL"}](https://)`;
     this.appendTextToTextArea(markdown);
+    const startOfURL = selectionStart + 1 + (selectedText ? selectedText.length : 3) + 2;
+    this.textarea.setSelectionRange(startOfURL, startOfURL + 8);
   };
 
   /**

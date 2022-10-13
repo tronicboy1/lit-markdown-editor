@@ -57,6 +57,9 @@ export declare class LitMarkdownEditor extends LitElement {
      * Renders templates when a template icon is clicked.
      */
     protected handleTemplateClick: EventListener;
+    /**
+     * Handles link icon click to wrap selected text in a URL markdown text.
+     */
     protected handleLinkClick: EventListener;
     /**
      * Opens file selection dialogue on a click to the add picture icon.
