@@ -2,7 +2,7 @@
 
 This package is a web component written using Lit to provide simple tools for writing markdown in the browser.
 
-Most markdown tools are very complicated; this component aims to offer a very unsophisticated solution.
+Most markdown tools are very complicated; this component aims to offer a very **un**sophisticated solution.
 
 # Dependencies
 
