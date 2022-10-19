@@ -29,6 +29,8 @@ export declare class LitMarkdownEditor extends LitElement {
     maxlength: string;
     protected textarea: HTMLTextAreaElement;
     protected fileInput: HTMLInputElement;
+    protected boldButton: HTMLLIElement;
+    protected italicsButton: HTMLLIElement;
     get required(): boolean;
     set required(newVal: boolean);
     /**
@@ -66,6 +68,14 @@ export declare class LitMarkdownEditor extends LitElement {
      */
     protected handleAddPictureClick: EventListener;
     /**
+     * Handles Enter keydown event and adds a new line for lists.
+     */
+    private handleEnterKeydown;
+    /**
+     * Hanldes the keydown event when the meta key is held.
+     */
+    private handleMetaKeydown;
+    /**
      * Handles file input when add picture button is clicked
      */
     protected handleFileInput: EventListener;
@@ -93,11 +103,7 @@ export declare class LitMarkdownEditor extends LitElement {
      * Will use element internals later.
      */
     renderToLightDom(): void;
-    /**
-     * Handles keydown event and adds a new line for lists.
-     */
-    private handleKeydown;
-    render(): import("lit-html").TemplateResult<1>;
+    render(): import("lit").TemplateResult<1>;
 }
 declare global {
     interface HTMLElementTagNameMap {

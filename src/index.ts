@@ -1,5 +1,6 @@
 import { html, LitElement, PropertyValueMap, render } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
+import { filter, fromEvent } from "rxjs";
 import { tagName as tableIconTag, TableIcon } from "./icons/table-icon.js";
 import { tagName as linkIconTag, LinkIcon } from "./icons/link-icon.js";
 import { loadComponent } from "./helpers/index.js";
@@ -50,6 +51,10 @@ export class LitMarkdownEditor extends LitElement {
   protected textarea!: HTMLTextAreaElement;
   @query("input#add-file")
   protected fileInput!: HTMLInputElement;
+  @query("li#b")
+  protected boldButton!: HTMLLIElement;
+  @query("li#i")
+  protected italicsButton!: HTMLLIElement;
   #required = false;
   @property({ attribute: "required", type: Boolean })
   public get required() {
@@ -103,6 +108,11 @@ export class LitMarkdownEditor extends LitElement {
     super.firstUpdated(_changedProperties);
     this.value = this.textContent ?? "";
     this.renderToLightDom();
+    const textareaKeydown$ = fromEvent<KeyboardEvent>(this.textarea, "keydown");
+    const metaKeyDown$ = textareaKeydown$.pipe(filter((event) => !event.isComposing && event.metaKey));
+    const enterKeyDown$ = textareaKeydown$.pipe(filter((event) => event.key === "Enter"));
+    metaKeyDown$.subscribe(this.handleMetaKeydown);
+    enterKeyDown$.subscribe(this.handleEnterKeydown);
     this.textarea.addEventListener(
       "input",
       () => {
@@ -202,6 +212,51 @@ export class LitMarkdownEditor extends LitElement {
   protected handleAddPictureClick: EventListener = () => {
     if (this.loading) return;
     this.fileInput.click();
+  };
+
+  /**
+   * Handles Enter keydown event and adds a new line for lists.
+   */
+  private handleEnterKeydown = (event: KeyboardEvent) => {
+    const { selectionStart, value } = this.textarea;
+    const startOfParagraph = value.lastIndexOf("\n", selectionStart - 2);
+    const currentParagraph = value.slice(startOfParagraph + 1, selectionStart);
+    const olRegex = /^([1-9][0-9]*). [^\n ]+/;
+    const isOl = currentParagraph.match(olRegex);
+    const ulRegex = / - [^\n ]+/;
+    const isUl = currentParagraph.match(ulRegex);
+    const isEmptyUlOrOl = /^(([1-9][0-9]*).| -) +$/.test(currentParagraph);
+    if (isOl || isUl || isEmptyUlOrOl) {
+      event.preventDefault();
+      if (isEmptyUlOrOl && "execCommand" in document) {
+        this.textarea.focus();
+        this.textarea.setSelectionRange(startOfParagraph + 1, selectionStart);
+        return document.execCommand("delete", false);
+      }
+      const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
+      this.appendTextToTextArea(symbol, symbol.length);
+    }
+  };
+
+  /**
+   * Hanldes the keydown event when the meta key is held.
+   */
+  private handleMetaKeydown = (event: KeyboardEvent) => {
+    const clickEvent = new Event("click");
+    switch (event.key.toUpperCase()) {
+      case "U":
+      case "L":
+        event.preventDefault();
+        this.handleLinkClick(event);
+        break;
+      case "B":
+        event.preventDefault();
+        this.boldButton.dispatchEvent(clickEvent);
+        break;
+      case "I":
+        event.preventDefault();
+        this.italicsButton.dispatchEvent(clickEvent);
+    }
   };
 
   /**
@@ -309,32 +364,6 @@ export class LitMarkdownEditor extends LitElement {
     this.internals.setValidity({});
   }
 
-  /**
-   * Handles keydown event and adds a new line for lists.
-   */
-  private handleKeydown = (event: KeyboardEvent) => {
-    if (event.isComposing) return;
-    if (event.key !== "Enter") return;
-    const { selectionStart, value } = this.textarea;
-    const startOfParagraph = value.lastIndexOf("\n", selectionStart - 2);
-    const currentParagraph = value.slice(startOfParagraph + 1, selectionStart);
-    const olRegex = /^([1-9][0-9]*). [^\n ]+/;
-    const isOl = currentParagraph.match(olRegex);
-    const ulRegex = / - [^\n ]+/;
-    const isUl = currentParagraph.match(ulRegex);
-    const isEmptyUlOrOl = /^(([1-9][0-9]*).| -) +$/.test(currentParagraph);
-    if (isOl || isUl || isEmptyUlOrOl) {
-      event.preventDefault();
-      if (isEmptyUlOrOl && "execCommand" in document) {
-        this.textarea.focus();
-        this.textarea.setSelectionRange(startOfParagraph + 1, selectionStart);
-        return document.execCommand("delete", false);
-      }
-      const symbol = isOl ? `\n${Number(isOl[1]) + 1}. ` : "\n - ";
-      this.appendTextToTextArea(symbol, symbol.length);
-    }
-  };
-
   render() {
     return html`
       <input @input=${this.handleFileInput} id="add-file" type="file" hidden accept="image/*" />
@@ -362,7 +391,7 @@ export class LitMarkdownEditor extends LitElement {
           </li>
         </ul>
       </nav>
-      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop} @keydown=${this.handleKeydown}></textarea>
+      <textarea name=${this.name} autocomplete="off" @drop=${this.handleDrop}></textarea>
       <slot name="input"></slot>
     `;
   }
