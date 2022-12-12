@@ -103,7 +103,7 @@ export declare class LitMarkdownEditor extends LitElement {
      * Will use element internals later.
      */
     renderToLightDom(): void;
-    render(): import("lit").TemplateResult<1>;
+    render(): import("lit-html").TemplateResult<1>;
 }
 declare global {
     interface HTMLElementTagNameMap {
