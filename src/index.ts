@@ -245,6 +245,7 @@ export class LitMarkdownEditor extends LitElement {
     const clickEvent = new Event("click");
     switch (event.key.toUpperCase()) {
       case "U":
+      case "K":
       case "L":
         event.preventDefault();
         this.handleLinkClick(event);
@@ -256,6 +257,9 @@ export class LitMarkdownEditor extends LitElement {
       case "I":
         event.preventDefault();
         this.italicsButton.dispatchEvent(clickEvent);
+      case "O":
+        event.preventDefault();
+        this.fileInput.click();
     }
   };
 
@@ -376,15 +380,15 @@ export class LitMarkdownEditor extends LitElement {
           <li @click=${this.handleHeaderClick} id="h5">H5</li>
           <li @click=${this.handleHeaderClick} id="ul"><bullet-list-icon></bullet-list-icon></li>
           <li @click=${this.handleHeaderClick} id="ol"><number-list-icon></number-list-icon></li>
-          <li @click=${this.handleModifierClick} id="i"><em>i</em></li>
-          <li @click=${this.handleModifierClick} id="b"><strong>B</strong></li>
-          <li @click=${this.handleTemplateClick} id="table">
+          <li @click=${this.handleModifierClick} id="i" title="italics (cmd + I)"><em>i</em></li>
+          <li @click=${this.handleModifierClick} id="b" title="bold (cmd + B)"><strong>B</strong></li>
+          <li @click=${this.handleTemplateClick} id="table" title="table">
             <table-icon></table-icon>
           </li>
-          <li @click=${this.handleLinkClick} id="link">
+          <li @click=${this.handleLinkClick} id="link" title="link (cmd + K)">
             <link-icon></link-icon>
           </li>
-          <li @click=${this.handleAddPictureClick} style="position: relative;">
+          <li @click=${this.handleAddPictureClick} style="position: relative;" title="add photo (cmd + O)">
             ${this.loading
               ? html`<loading-icon small black></loading-icon>`
               : html`<new-picture-icon></new-picture-icon>`}
