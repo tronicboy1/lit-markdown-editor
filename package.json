@@ -1,6 +1,6 @@
 {
   "name": "lit-markdown-editor",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "A texteditor web component for writing markdown.",
   "main": "./lib/index.js",
   "type": "module",
@@ -17,8 +17,8 @@
     "url": "https://github.com/tronicboy1/lit-markdown-editor"
   },
   "dependencies": {
-    "lit": "^2.5.0",
-    "rxjs": "^7.6.0"
+    "lit": "^2.6.1",
+    "rxjs": "^7.8.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
@@ -26,7 +26,7 @@
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "format": "prettier --write ./",
